@@ -11,6 +11,7 @@ from fastapi import (
     File,
     Form,
     Body,
+Response
 )
 from fastapi.responses import FileResponse
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
@@ -196,10 +197,10 @@ async def get_approved_advertisements(current_user: User = Depends(get_current_u
 async def get_image(file_name: str, current_user: User = Depends(get_current_user)):
     image_full_path = os.path.join(os.getcwd(), file_name)
     if os.path.exists(image_full_path):
-        return FileResponse(image_full_path)
+        with open(image_full_path, "rb") as image_file:
+            return Response(content=image_file.read(), media_type="image/png")
     else:
         raise HTTPException(status_code=404, detail="Image not found")
-
 
 @router.put("/{advertisement_id}", tags=["advertisement"])
 async def close_advertisement(
