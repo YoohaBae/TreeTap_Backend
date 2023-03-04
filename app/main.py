@@ -15,7 +15,10 @@ tags_metadata = [
         "name": "auth",
         "description": "Operations with authorization.",
     },
-    {"name": "contact", "description": "Operations with registering advertisement"},
+    {
+        "name": "advertisement",
+        "description": "Operations with registering advertisement",
+    },
     {"name": "advertisements", "description": "Operations with advertisements"},
 ]
 app = FastAPI(openapi_tags=tags_metadata)

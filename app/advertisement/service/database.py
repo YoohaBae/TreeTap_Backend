@@ -26,3 +26,13 @@ def approve_advertisement(advertisement_id):
     db.advertisements.update_one(
         {"_id": ObjectId(advertisement_id)}, {"$set": {"approved": True}}
     )
+
+
+def get_all_advertisements():
+    advertisements = list(db.advertisements.find({}))
+    return advertisements
+
+
+def get_approved_advertisements():
+    approved_advertisements = list(db.advertisements.find({"approved": True}))
+    return approved_advertisements
