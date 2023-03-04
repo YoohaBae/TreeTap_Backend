@@ -64,9 +64,19 @@ def protected_route(current_user: User = Depends(get_current_user)):
 @router.post("/plant", tags=["profile"])
 def plant_tree(advertisement_id: str, current_user: User = Depends(get_current_user)):
     advertisement = ad_db.get_advertisement(advertisement_id)
+    if advertisement is None:
+        raise HTTPException(status_code=400, detail="No such advertisement exists")
     if advertisement["closed"]:
         raise HTTPException(status_code=400, detail="No more coupons available")
     trees_per_click = advertisement.get("trees_per_click", 1)
+    # Check if user already has a coupon
+    exists = coupon_db.check_if_user_already_has_coupon(
+        advertisement_id, current_user.emailAddress
+    )
+    if exists:
+        raise HTTPException(
+            status_code=400, detail="User already has a coupon for this advertisement"
+        )
     # Select a random coupon code for the user and mark it as used
     coupon_code = coupon_db.select_random_coupon_code(advertisement_id)
     if not coupon_code:

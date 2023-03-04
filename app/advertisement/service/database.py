@@ -54,7 +54,3 @@ def increase_trees_planted_in_advertisement(advertisement_id, trees_per_click):
         },
         {"$inc": {"trees_planted": trees_per_click}},
     )
-
-
-def add_coupon(coupon: dict):
-    db.coupons.insert_one(coupon)

@@ -17,6 +17,7 @@ from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 from app.utils.utils import get_current_user
 from app.auth.models.user import User
 from app.advertisement.service import database
+from app.auth.service import coupon_db
 
 router = APIRouter()
 
@@ -141,7 +142,7 @@ async def approve_advertisement(
     # Add coupon codes to the coupons collection
     for code in coupon_codes:
         coupon = {"advertisement_id": advertisement_id, "code": code}
-        database.add_coupon(coupon)
+        coupon_db.add_coupon(coupon)
 
     # Send notification email to the advertiser
     advertiser_email = advertisement["created_by"]
@@ -216,3 +217,29 @@ async def close_advertisement(
     # Update the advertisement to set the closed field to True
     database.close_advertisement(advertisement_id)
     return {"message": "Advertisement closed successfully"}
+
+
+@router.put("/{advertisement_id}/coupons", tags=["coupons"])
+def refill_coupons(advertisement_id: str, coupon_codes: List[str] = Body(default=[])):
+    advertisement = database.get_advertisement(advertisement_id)
+    if not advertisement:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Advertisement not found"
+        )
+
+    current_coupons = coupon_db.get_ad_coupons(advertisement_id)
+    current_coupon_codes = [c["code"] for c in current_coupons]
+
+    # Check if any of the new coupon numbers already exist
+    duplicates = set(current_coupon_codes) & set(coupon_codes)
+    if duplicates:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Duplicate coupon numbers: {', '.join(duplicates)}",
+        )
+    # Add the new coupon codes to the database
+    new_coupons = [
+        {"advertisement_id": advertisement_id, "coupon_code": c} for c in coupon_codes
+    ]
+    coupon_db.add_coupons(new_coupons)
+    return {"message": f"{len(new_coupons)} coupon codes added successfully"}
