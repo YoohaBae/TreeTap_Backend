@@ -1,4 +1,6 @@
 import os
+import uuid
+from enum import Enum
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from fastapi.responses import FileResponse
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
@@ -25,6 +27,12 @@ conf = ConnectionConfig(
     MAIL_SSL_TLS=True,
 )
 
+
+class MediaTypeEnum(str, Enum):
+    png = "image/png"
+    jpg = "image/jpeg"
+
+
 # Create FastMail instance
 mail = FastMail(conf)
 
@@ -36,7 +44,9 @@ async def request_advertisement(
     coupon_info: str = Form(...),
     trees_per_click: int = Form(...),
     advertisement_content: str = Form(...),
-    advertisement_image: UploadFile = File(...),
+    advertisement_image: UploadFile = File(
+        ..., media_type=str([MediaTypeEnum.png, MediaTypeEnum.jpg])
+    ),
     current_user: User = Depends(get_current_user),
 ):
     # Create new advertisement object
@@ -51,7 +61,9 @@ async def request_advertisement(
     }
 
     # Save the uploaded image to the file system
-    file_path = os.path.join(UPLOAD_DIR, advertisement_image.filename)
+    file_extension = os.path.splitext(advertisement_image.filename)[1]
+    unique_filename = str(uuid.uuid4()) + file_extension
+    file_path = os.path.join(UPLOAD_DIR, unique_filename)
     with open(file_path, "wb") as f:
         f.write(advertisement_image.file.read())
 
