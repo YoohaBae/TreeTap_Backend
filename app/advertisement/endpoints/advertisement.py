@@ -12,6 +12,7 @@ from fastapi import (
     Form,
     Body,
     Response,
+    Query,
 )
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 from app.utils.utils import get_current_user
@@ -253,8 +254,15 @@ def refill_coupons(advertisement_id: str, coupon_codes: List[str] = Body(default
 
 @router.get("/filter", tags=["advertisement"])
 async def get_advertisements_of_ids(
-    advertisement_ids: List[str], current_user: User = Depends(get_current_user)
+    advertisement_ids: str = Query(None), current_user: User = Depends(get_current_user)
 ):
+    if advertisement_ids is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing advertisement_ids parameter",
+        )
+
+    advertisement_ids = advertisement_ids.split(",")
     approved_advertisements = database.get_approved_advertisements_by_ids(
         advertisement_ids
     )
