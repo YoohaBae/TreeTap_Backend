@@ -170,6 +170,9 @@ async def get_all_advertisements(current_user: User = Depends(get_current_user))
     # Convert binary image data to base64-encoded string
     for advertisement in advertisements:
         advertisement["_id"] = str(advertisement["_id"])
+        advertisement["advertisement_content"] = advertisement[
+            "advertisement_content"
+        ].replace("\\n", "")
 
     return advertisements
 
@@ -182,6 +185,9 @@ async def get_approved_advertisements(current_user: User = Depends(get_current_u
     # Convert binary image data to base64-encoded string
     for advertisement in approved_advertisements:
         advertisement["_id"] = str(advertisement["_id"])
+        advertisement["advertisement_content"] = advertisement[
+            "advertisement_content"
+        ].replace("\\n", "")
 
     return approved_advertisements
 
