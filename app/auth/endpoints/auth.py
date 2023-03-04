@@ -13,7 +13,7 @@ from app.utils.utils import get_current_user, create_access_token
 router = APIRouter()
 
 # Token expiration time (in minutes)
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 120
 
 # Initialize password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

@@ -13,7 +13,6 @@ from fastapi import (
     Body,
     Response,
 )
-from fastapi.responses import FileResponse
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 from app.utils.utils import get_current_user
 from app.auth.models.user import User
