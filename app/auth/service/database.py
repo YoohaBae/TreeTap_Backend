@@ -7,11 +7,7 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-db_user_name = os.getenv("MONGODB_USER")
-db_password = os.getenv("MONGODB_PW")
-client = MongoClient(
-    f"mongodb+srv://{db_user_name}:{db_password}@treetap.9wqqzyq.mongodb.net/?retryWrites=true&w=majority"
-)
+client = MongoClient(os.getenv("MONGO_URI"))
 db = client["dev"]
 
 

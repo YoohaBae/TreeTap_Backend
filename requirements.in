@@ -10,3 +10,4 @@ PyJWT
 passlib
 python-multipart
 bcrypt
+fastapi_mail

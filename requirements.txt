@@ -4,6 +4,8 @@
 #
 #    pip-compile requirements.in
 #
+aiosmtplib==2.0.1
+    # via fastapi-mail
 anyio==3.6.2
     # via
     #   starlette
@@ -12,6 +14,8 @@ bcrypt==4.0.1
     # via -r requirements.in
 black==23.1.0
     # via -r requirements.in
+blinker==1.5
+    # via fastapi-mail
 certifi==2022.12.7
     # via requests
 charset-normalizer==3.0.1
@@ -21,8 +25,14 @@ click==8.1.3
     #   black
     #   uvicorn
 dnspython==2.3.0
-    # via pymongo
+    # via
+    #   email-validator
+    #   pymongo
+email-validator==1.3.1
+    # via fastapi-mail
 fastapi==0.92.0
+    # via -r requirements.in
+fastapi-mail==1.2.6
     # via -r requirements.in
 flake8==6.0.0
     # via -r requirements.in
@@ -33,9 +43,14 @@ httptools==0.5.0
 idna==3.4
     # via
     #   anyio
+    #   email-validator
     #   requests
 itsdangerous==2.1.2
     # via -r requirements.in
+jinja2==3.1.2
+    # via fastapi-mail
+markupsafe==2.1.2
+    # via jinja2
 mccabe==0.7.0
     # via flake8
 mypy-extensions==1.0.0
@@ -51,7 +66,9 @@ platformdirs==3.1.0
 pycodestyle==2.10.0
     # via flake8
 pydantic==1.10.5
-    # via fastapi
+    # via
+    #   fastapi
+    #   fastapi-mail
 pyflakes==3.0.1
     # via flake8
 pyjwt==2.6.0
@@ -69,7 +86,9 @@ requests==2.28.2
 sniffio==1.3.0
     # via anyio
 starlette==0.25.0
-    # via fastapi
+    # via
+    #   fastapi
+    #   fastapi-mail
 tomli==2.0.1
     # via black
 typing-extensions==4.5.0
