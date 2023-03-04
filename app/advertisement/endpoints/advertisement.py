@@ -4,7 +4,7 @@ from enum import Enum
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from fastapi.responses import FileResponse
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
-from app.auth.endpoints.auth import get_current_user
+from app.utils.utils import get_current_user
 from app.auth.models.user import User
 from app.advertisement.service import database
 
@@ -58,6 +58,7 @@ async def request_advertisement(
         "advertisement_content": advertisement_content,
         "created_by": current_user.emailAddress,
         "approved": False,
+        "closed": False,
     }
 
     # Save the uploaded image to the file system
@@ -99,8 +100,8 @@ async def request_advertisement(
 
 
 @router.post("/{advertisement_id}/approve", tags=["advertisement"])
-async def post_approve_ad(
-    advertisement_id: str, current_user: User = Depends(get_current_user)
+async def approve_advertisement(
+    advertisement_id: str, ngo: str, current_user: User = Depends(get_current_user)
 ):
     # Retrieve the advertisement from the database
     advertisement = database.get_advertisement(advertisement_id)
@@ -116,7 +117,7 @@ async def post_approve_ad(
             detail="Only administrators can approve advertisements",
         )
 
-    database.approve_advertisement(advertisement_id)
+    database.approve_advertisement(advertisement_id, ngo)
 
     # Send notification email to the advertiser
     advertiser_email = advertisement["created_by"]
@@ -150,7 +151,7 @@ async def get_all_advertisements(current_user: User = Depends(get_current_user))
 
 
 @router.get("/", tags=["advertisement"])
-async def get_approved_advertisements():
+async def get_approved_advertisements(current_user: User = Depends(get_current_user)):
     # Retrieve approved advertisements from MongoDB
     approved_advertisements = database.get_approved_advertisements()
 
@@ -162,9 +163,25 @@ async def get_approved_advertisements():
 
 
 @router.get("/images")
-async def get_image(file_name: str):
+async def get_image(file_name: str, current_user: User = Depends(get_current_user)):
     image_full_path = os.path.join(os.getcwd(), file_name)
     if os.path.exists(image_full_path):
         return FileResponse(image_full_path)
     else:
         raise HTTPException(status_code=404, detail="Image not found")
+
+
+@router.put("/{advertisement_id}", tags=["advertisement"])
+async def close_advertisement(
+    advertisement_id: str, current_user: User = Depends(get_current_user)
+):
+    # Check if the current user is authorized to approve the advertisement
+    if current_user.emailAddress != admin_email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Only administrators can approve advertisements",
+        )
+
+    # Update the advertisement to set the closed field to True
+    database.close_advertisement(advertisement_id)
+    return {"message": "Advertisement closed successfully"}

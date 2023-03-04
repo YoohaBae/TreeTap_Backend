@@ -27,3 +27,9 @@ def create_user(user: UserCreate):
 
 def user_exists(emailAddress: str):
     return db.users.find_one({"emailAddress": emailAddress}) is not None
+
+
+def plant_tree(emailAddress: str, num_of_tree: int):
+    db.users.update_one(
+        {"emailAddress": emailAddress}, {"$inc": {"trees_planted": num_of_tree}}
+    )
