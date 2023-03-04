@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from app.auth.service.database import get_user, create_user, user_exists
-from app.auth.models.user import UserCreate, User, Token
+from app.auth.models.user import UserCreate, User
 
 router = APIRouter()
 
@@ -48,7 +48,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         emailAddress: str = payload.get("sub")
         if emailAddress is None:
-            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+            raise HTTPException(
+                status_code=401, detail="Invalid authentication credentials"
+            )
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.InvalidTokenError:
@@ -79,8 +81,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
     access_token_expires = datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.emailAddress},
-        expires_delta=access_token_expires
+        data={"sub": user.emailAddress}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 

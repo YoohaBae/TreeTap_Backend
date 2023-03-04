@@ -9,8 +9,10 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 db_user_name = os.getenv("MONGODB_USER")
 db_password = os.getenv("MONGODB_PW")
-client = MongoClient(f"mongodb+srv://{db_user_name}:{db_password}@treetap.9wqqzyq.mongodb.net/?retryWrites=true&w=majority")
-db = client["mydatabase"]
+client = MongoClient(
+    f"mongodb+srv://{db_user_name}:{db_password}@treetap.9wqqzyq.mongodb.net/?retryWrites=true&w=majority"
+)
+db = client["dev"]
 
 
 def get_user(emailAddress: str):
@@ -22,7 +24,9 @@ def get_user(emailAddress: str):
 
 def create_user(user: UserCreate):
     hashed_password = pwd_context.hash(user.password)
-    db.users.insert_one({"emailAddress": user.emailAddress, "hashed_password": hashed_password})
+    db.users.insert_one(
+        {"emailAddress": user.emailAddress, "hashed_password": hashed_password}
+    )
 
 
 def user_exists(emailAddress: str):

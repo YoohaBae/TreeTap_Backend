@@ -1,1 +1,1 @@
-from .auth import router
+from .auth import router  # type: ignore  # noqa: F401

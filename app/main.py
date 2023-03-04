@@ -4,7 +4,7 @@ GuROOM backend main.py
 
 import uvicorn
 import os
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.sessions import SessionMiddleware
@@ -25,7 +25,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "https://treetap.net",
-        "http://localhost:8000"
+        "http://localhost:8000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
