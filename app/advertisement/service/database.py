@@ -52,5 +52,5 @@ def increase_trees_planted_in_advertisement(advertisement_id, trees_per_click):
         {
             "_id": ObjectId(advertisement_id),
         },
-        {"$inc", {"trees_planted": trees_per_click}},
+        {"$inc": {"trees_planted": trees_per_click}},
     )

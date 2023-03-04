@@ -30,9 +30,6 @@ def authenticate_user(emailAddress: str, password: str):
     return user
 
 
-
-
-
 @router.post("/signup", tags=["auth"], status_code=status.HTTP_201_CREATED)
 def sign_up(user: UserCreate):
     # Check if user already exists in the database
@@ -68,5 +65,18 @@ def plant_tree(advertisement_id: str, current_user: User = Depends(get_current_u
     advertisement = ad_db.get_advertisement(advertisement_id)
     trees_per_click = advertisement.get("trees_per_click", 1)
     ad_db.increase_trees_planted_in_advertisement(advertisement_id, trees_per_click)
+
     database.plant_tree(current_user.emailAddress, trees_per_click)
     return {"message": "Trees planted successfully"}
+
+
+@router.get("/profile", tags=["profile"])
+def get_profile(current_user: User = Depends(get_current_user)):
+    num_of_trees = database.get_num_of_trees(current_user.emailAddress)
+    carbon_credit = num_of_trees * 22
+    profile = {
+        "num_of_trees": num_of_trees,
+        "carbon_credit": carbon_credit,
+        "email_address": current_user.emailAddress,
+    }
+    return profile

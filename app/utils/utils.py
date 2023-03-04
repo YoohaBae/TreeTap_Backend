@@ -11,6 +11,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # Algorithm used for JWT token encoding
 ALGORITHM = "HS256"
 
+
 def create_access_token(data: dict, expires_delta: datetime.timedelta):
     to_encode = data.copy()
     expire = datetime.datetime.utcnow() + expires_delta
