@@ -59,8 +59,12 @@ def increase_trees_planted_in_advertisement(advertisement_id, trees_per_click):
 
 def get_approved_advertisements_by_ids(advertisement_ids: List[str]):
     object_ids = [ObjectId(id) for id in advertisement_ids]
-    advertisements = list(db.advertisements.find({"_id": {"$in": object_ids}, "approved": True}))
+    advertisements = list(
+        db.advertisements.find({"_id": {"$in": object_ids}, "approved": True})
+    )
     for advertisement in advertisements:
         advertisement["_id"] = str(advertisement["_id"])
-        advertisement["advertisement_content"] = advertisement["advertisement_content"].replace("\\n", "")
+        advertisement["advertisement_content"] = advertisement[
+            "advertisement_content"
+        ].replace("\\n", "")
     return advertisements
