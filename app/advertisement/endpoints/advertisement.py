@@ -11,7 +11,7 @@ from fastapi import (
     File,
     Form,
     Body,
-Response
+    Response,
 )
 from fastapi.responses import FileResponse
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
@@ -91,7 +91,7 @@ async def request_advertisement(
         body=f"Dear Admin,\n\nA new advertisement has been created by {current_user.emailAddress}."
         f"\n\nCompany Name: {company_name}\nWebsite: {website}\nCoupon Info: {coupon_info}\n"
         f"Trees per Click: {trees_per_click}\nAdvertisement Content: {advertisement_content}\n\n"
-        f"Best regards,\nYour Application",
+        f"Best regards,\nTree Tap YYY",
         subtype="plain",
     )
     await mail.send_message(message)
@@ -102,7 +102,7 @@ async def request_advertisement(
         recipients=[current_user.emailAddress],
         body=f"Dear {current_user.emailAddress},\n\nThank you for submitting your advertisement request. "
         f"We have received your request and will review your advertisement soon. We will be in advertisement "
-        f"with you shortly regarding the status of your request.\n\nBest regards,\nYour Application",
+        f"with you shortly regarding the status of your request.\n\nBest regards,\nTree Tap YYY",
         subtype="plain",
     )
     await mail.send_message(user_message)
@@ -201,6 +201,7 @@ async def get_image(file_name: str):
             return Response(content=image_file.read(), media_type="image/png")
     else:
         raise HTTPException(status_code=404, detail="Image not found")
+
 
 @router.put("/{advertisement_id}", tags=["advertisement"])
 async def close_advertisement(
