@@ -1,7 +1,17 @@
 import os
 import uuid
 from enum import Enum
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from typing import List
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+    UploadFile,
+    File,
+    Form,
+    Body,
+)
 from fastapi.responses import FileResponse
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 from app.utils.utils import get_current_user
@@ -101,7 +111,10 @@ async def request_advertisement(
 
 @router.post("/{advertisement_id}/approve", tags=["advertisement"])
 async def approve_advertisement(
-    advertisement_id: str, ngo: str, current_user: User = Depends(get_current_user)
+    advertisement_id: str,
+    ngo: str,
+    coupon_codes: List[str] = Body(default=[]),
+    current_user: User = Depends(get_current_user),
 ):
     # Retrieve the advertisement from the database
     advertisement = database.get_advertisement(advertisement_id)
@@ -117,7 +130,18 @@ async def approve_advertisement(
             detail="Only administrators can approve advertisements",
         )
 
+    # Check if the coupon codes are valid and not duplicates
+    if len(coupon_codes) != len(set(coupon_codes)):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Duplicate coupon codes"
+        )
+
     database.approve_advertisement(advertisement_id, ngo)
+
+    # Add coupon codes to the coupons collection
+    for code in coupon_codes:
+        coupon = {"advertisement_id": advertisement_id, "code": code}
+        database.add_coupon(coupon)
 
     # Send notification email to the advertiser
     advertiser_email = advertisement["created_by"]

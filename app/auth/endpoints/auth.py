@@ -5,6 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from passlib.context import CryptContext
 from app.auth.service import database
+from app.auth.service import coupon_db
 from app.auth.models.user import UserCreate, User
 from app.advertisement.service import database as ad_db
 from app.utils.utils import get_current_user, create_access_token
@@ -63,9 +64,20 @@ def protected_route(current_user: User = Depends(get_current_user)):
 @router.post("/plant", tags=["profile"])
 def plant_tree(advertisement_id: str, current_user: User = Depends(get_current_user)):
     advertisement = ad_db.get_advertisement(advertisement_id)
+    if advertisement["closed"]:
+        raise HTTPException(status_code=400, detail="No more coupons available")
     trees_per_click = advertisement.get("trees_per_click", 1)
+    # Select a random coupon code for the user and mark it as used
+    coupon_code = coupon_db.select_random_coupon_code(advertisement_id)
+    if not coupon_code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No available coupon codes for the advertisement",
+        )
+    coupon_db.mark_coupon_code_as_used(
+        advertisement_id, coupon_code, current_user.emailAddress
+    )
     ad_db.increase_trees_planted_in_advertisement(advertisement_id, trees_per_click)
-
     database.plant_tree(current_user.emailAddress, trees_per_click)
     return {"message": "Trees planted successfully"}
 
@@ -74,9 +86,11 @@ def plant_tree(advertisement_id: str, current_user: User = Depends(get_current_u
 def get_profile(current_user: User = Depends(get_current_user)):
     num_of_trees = database.get_num_of_trees(current_user.emailAddress)
     carbon_credit = num_of_trees * 22
+    user_coupons = coupon_db.get_user_coupons(current_user.emailAddress)
     profile = {
         "num_of_trees": num_of_trees,
         "carbon_credit": carbon_credit,
         "email_address": current_user.emailAddress,
+        "user_coupons": user_coupons,
     }
     return profile
