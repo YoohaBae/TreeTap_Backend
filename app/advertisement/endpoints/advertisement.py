@@ -194,7 +194,7 @@ async def get_approved_advertisements(current_user: User = Depends(get_current_u
 
 
 @router.get("/images")
-async def get_image(file_name: str, current_user: User = Depends(get_current_user)):
+async def get_image(file_name: str):
     image_full_path = os.path.join(os.getcwd(), file_name)
     if os.path.exists(image_full_path):
         with open(image_full_path, "rb") as image_file:
