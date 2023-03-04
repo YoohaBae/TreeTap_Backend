@@ -50,15 +50,15 @@ mail = FastMail(conf)
 
 @router.post("/register", tags=["advertisement"])
 async def request_advertisement(
-    company_name: str = Form(...),
-    website: str = Form(...),
-    coupon_info: str = Form(...),
-    trees_per_click: int = Form(...),
-    advertisement_content: str = Form(...),
-    advertisement_image: UploadFile = File(
-        ..., media_type=str([MediaTypeEnum.png, MediaTypeEnum.jpg])
-    ),
-    current_user: User = Depends(get_current_user),
+        company_name: str = Form(...),
+        website: str = Form(...),
+        coupon_info: str = Form(...),
+        trees_per_click: int = Form(...),
+        advertisement_content: str = Form(...),
+        advertisement_image: UploadFile = File(
+            ..., media_type=str([MediaTypeEnum.png, MediaTypeEnum.jpg])
+        ),
+        current_user: User = Depends(get_current_user),
 ):
     # Create new advertisement object
     advertisement = {
@@ -89,9 +89,9 @@ async def request_advertisement(
         subject="New Advertisement Created",
         recipients=[admin_email],
         body=f"Dear Admin,\n\nA new advertisement has been created by {current_user.emailAddress}."
-        f"\n\nCompany Name: {company_name}\nWebsite: {website}\nCoupon Info: {coupon_info}\n"
-        f"Trees per Click: {trees_per_click}\nAdvertisement Content: {advertisement_content}\n\n"
-        f"Best regards,\nTree Tap YYY",
+             f"\n\nCompany Name: {company_name}\nWebsite: {website}\nCoupon Info: {coupon_info}\n"
+             f"Trees per Click: {trees_per_click}\nAdvertisement Content: {advertisement_content}\n\n"
+             f"Best regards,\nTree Tap YYY",
         subtype="plain",
     )
     await mail.send_message(message)
@@ -101,8 +101,8 @@ async def request_advertisement(
         subject="Advertisement Request Received",
         recipients=[current_user.emailAddress],
         body=f"Dear {current_user.emailAddress},\n\nThank you for submitting your advertisement request. "
-        f"We have received your request and will review your advertisement soon. We will be in advertisement "
-        f"with you shortly regarding the status of your request.\n\nBest regards,\nTree Tap YYY",
+             f"We have received your request and will review your advertisement soon. We will be in advertisement "
+             f"with you shortly regarding the status of your request.\n\nBest regards,\nTree Tap YYY",
         subtype="plain",
     )
     await mail.send_message(user_message)
@@ -112,10 +112,10 @@ async def request_advertisement(
 
 @router.post("/{advertisement_id}/approve", tags=["advertisement"])
 async def approve_advertisement(
-    advertisement_id: str,
-    ngo: str,
-    coupon_codes: List[str] = Body(default=[]),
-    current_user: User = Depends(get_current_user),
+        advertisement_id: str,
+        ngo: str,
+        coupon_codes: List[str] = Body(default=[]),
+        current_user: User = Depends(get_current_user),
 ):
     # Retrieve the advertisement from the database
     advertisement = database.get_advertisement(advertisement_id)
@@ -150,7 +150,7 @@ async def approve_advertisement(
         subject="Advertisement Approved",
         recipients=[advertiser_email],
         body="Dear Advertiser,\n\nYour advertisement has been approved and is now live. "
-        "Thank you for using our service!\n\nBest regards,\nTree Tap",
+             "Thank you for using our service!\n\nBest regards,\nTree Tap",
         subtype="plain",
     )
     await mail.send_message(message)
@@ -205,7 +205,7 @@ async def get_image(file_name: str):
 
 @router.put("/{advertisement_id}", tags=["advertisement"])
 async def close_advertisement(
-    advertisement_id: str, current_user: User = Depends(get_current_user)
+        advertisement_id: str, current_user: User = Depends(get_current_user)
 ):
     # Check if the current user is authorized to approve the advertisement
     if current_user.emailAddress != admin_email:
@@ -243,3 +243,9 @@ def refill_coupons(advertisement_id: str, coupon_codes: List[str] = Body(default
     ]
     coupon_db.add_coupons(new_coupons)
     return {"message": f"{len(new_coupons)} coupon codes added successfully"}
+
+
+@router.get("/filter", tags=["advertisement"])
+async def get_advertisements_of_ids(advertisement_ids: List[str], current_user: User = Depends(get_current_user)):
+    approved_advertisements = database.get_approved_advertisements_by_ids(advertisement_ids)
+    return approved_advertisements
