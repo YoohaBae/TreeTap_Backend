@@ -12,15 +12,15 @@ from app.contact.service.database import (
 
 router = APIRouter()
 
-email = os.getenv("EMAIL_ADDRESS")
-email_password = os.getenv("EMAIL_PASSWORD")
+server_email = os.getenv("EMAIL_ADDRESS")
+server_email_password = os.getenv("EMAIL_PASSWORD")
 admin_email = os.getenv("ADMIN_EMAIL")
 
 
 # Mail connection configuration
 conf = ConnectionConfig(
-    MAIL_USERNAME=email,
-    MAIL_PASSWORD=email_password,
+    MAIL_USERNAME=server_email,
+    MAIL_PASSWORD=server_email_password,
     MAIL_FROM="treetap.yyy@gmail.com",
     MAIL_PORT=465,
     MAIL_SERVER="smtp.gmail.com",
@@ -74,7 +74,7 @@ async def request_advertisement(
     # Send confirmation email to the user
     user_message = MessageSchema(
         subject="Advertisement Request Received",
-        recipients=[email],
+        recipients=[current_user.emailAddress],
         body=f"Dear {current_user.emailAddress},\n\nThank you for submitting your advertisement request. "
         f"We have received your request and will review your advertisement soon. We will be in contact "
         f"with you shortly regarding the status of your request.\n\nBest regards,\nYour Application",
