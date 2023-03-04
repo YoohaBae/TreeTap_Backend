@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+requests
+pymongo
+flake8
+black
+pymongo[srv]
+itsdangerous
+PyJWT
+passlib
+python-multipart
+bcrypt
