@@ -1,0 +1,44 @@
+name: Deployment
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve updated changes
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: ${{secrets.SSH_HOST}}
+          key: ${{secrets.SSH_KEY}}
+          username: ${{secrets.SSH_USERNAME}}
+        
+          script: |
+            cd /root/TreeTap_Backend
+            git pull
+            
+      - name: pip install
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: ${{secrets.SSH_HOST}}
+          key: ${{secrets.SSH_KEY}}
+          username: ${{secrets.SSH_USERNAME}}
+        
+          script: |
+            cd /root/GuROOM_Backend
+            pip install -r requirements.txt
+            
+      - name: restart python script
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: ${{secrets.SSH_HOST}}
+          key: ${{secrets.SSH_KEY}}
+          username: ${{secrets.SSH_USERNAME}}
+        
+          script: |
+            cd /root/TreeTap_Backend
+            pkill python
+            source setenv.sh
+            echo $MONGO_URI
+            python -m gunicorn -D app.main:app --worker-class uvicorn.workers.UvicornWorker
