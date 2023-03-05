@@ -26,7 +26,7 @@ jobs:
           username: ${{secrets.SSH_USERNAME}}
         
           script: |
-            cd /root/GuROOM_Backend
+            cd /root/TreeTap_Backend
             pip install -r requirements.txt
             
       - name: restart python script
