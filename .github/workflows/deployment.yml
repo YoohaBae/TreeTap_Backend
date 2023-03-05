@@ -38,7 +38,7 @@ jobs:
         
           script: |
             cd /root/TreeTap_Backend
-            pkill -f "gunicorn -D app.main:app --worker-class uvicorn.workers.UvicornWorker"
+            pkill python
             source setenv.sh
             echo $MONGO_URI
-            gunicorn -D app.main:app --worker-class uvicorn.workers.UvicornWorker
+            python -m gunicorn -D app.main:app --worker-class uvicorn.workers.UvicornWorker
