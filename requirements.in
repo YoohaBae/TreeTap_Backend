@@ -11,3 +11,4 @@ passlib
 python-multipart
 bcrypt
 fastapi_mail
+gunicorn
